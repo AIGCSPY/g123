@@ -1,0 +1,46 @@
+{
+  "links": [
+    {
+      "name": "Axure原型网",
+      "url": "https://www.axurecn.com",
+      "description": "专业的原型设计分享工具"
+    },
+    {
+      "name": "苏米客",
+      "url": "https://www.xmsumi.com",
+      "description": "10+年产品经理分享"
+    },
+    {
+      "name": "摸鱼范",
+      "url": "http://www.moyufan.com",
+      "description": "摸鱼有范，效率更高"
+    },
+    {
+      "name": "爱酷导航",
+      "url": "http://www.icoolgo.com",
+      "description": "产品经理导航分享"
+    },
+    {
+      "name": "稿字体",
+      "url": "http://www.gaoziti.com",
+      "description": "产品经理导航分享"
+    }
+  ],
+  "copyright": {
+    "text": "© 2019-2025 by 爱酷导航",
+    "links": [
+      {
+        "text": "爱酷导航",
+        "url": "http://www.icoolgo.com"
+      },
+      {
+        "text": "苏米客",
+        "url": "https://www.xmsumi.com"
+      }
+    ],
+    "icp": {
+      "text": "闽ICP备15002536号-6",
+      "url": "http://beian.miit.gov.cn/"
+    }
+  }
+}
