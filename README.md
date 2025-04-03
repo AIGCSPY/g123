@@ -7,7 +7,7 @@
 <h3 align="center">开源产品经理导航 · 标签页 · 搜索 · 自定义导航 </h3>
 <p align="center">使用Cursor开发的网址导航网站，支持自定义首页样式、网址、接口等</p>
 
-<p align="center"><a href="http://www.icoolgo.com/" target="_blank">演示</a></p>
+<p align="center"><a href="https://www.icoolgo.com/" target="_blank">演示</a></p>
 
 ## 简介
 
