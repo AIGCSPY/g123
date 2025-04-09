@@ -22,7 +22,7 @@ export const Weather = () => {
     const fetchWeather = async () => {
       try {
         const response = await fetch(
-          'http://widget-v3.seniverse.com/api/weather/fd08684d-bf66-4982-999d-4d0f260c236d?unit=c&language=zh-Hans&location=WX4FBXXFKE4F&geolocation=true&detected=zh-cn'
+          'https://widget-v3.seniverse.com/api/weather/fd08684d-bf66-4982-999d-4d0f260c236d?unit=c&language=zh-Hans&location=WX4FBXXFKE4F&geolocation=true&detected=zh-cn'
         );
         const data = await response.json();
         if (data.success && data.results?.[0]?.data?.[0]) {

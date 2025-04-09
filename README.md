@@ -1,8 +1,9 @@
 <p align="center">
-  <a href="http://www.icoolgo.com" target="_blank">
+  <a href="https://www.icoolgo.com" target="_blank">
     <img src="public/icon/logo.svg" width="318px" alt="爱酷搜索" />
   </a>
 </p>
+
 
 <h3 align="center">开源产品经理导航 · 标签页 · 搜索 · 自定义导航 </h3>
 <p align="center">使用Cursor开发的网址导航网站，支持自定义首页样式、网址、接口等</p>

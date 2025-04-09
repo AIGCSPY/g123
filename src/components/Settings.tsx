@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link'
+import { Github } from 'lucide-react'
 import { IoSettingsOutline } from 'react-icons/io5';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -222,6 +224,15 @@ export function Settings({ onSettingsChange }: SettingsProps) {
 
   return (
     <div className="flex items-center gap-2">
+      <Link
+            href="https://github.com/xmsumi/icoolgo-pm-navigator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--text-color)] hover:text-[var(--primary-color)]"
+          >
+            <Github className="h-5 w-5" />
+            <span className="sr-only">GitHub</span>
+          </Link>
       <Button
         variant="outline"
         size="icon"
