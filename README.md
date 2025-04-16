@@ -5,14 +5,14 @@
 </p>
 
 
-<h3 align="center">开源产品经理导航 · 标签页 · 搜索 · 自定义导航 </h3>
-<p align="center">使用Cursor开发的网址导航网站，支持自定义首页样式、网址、接口等</p>
+<h3 align="center">Open Source PM-Navigator · Tab Page · Search · Custom Navigation </h3>
+<p align="center">Developed using Cursor, the website provides URL navigation with support for customizing the homepage style, URLs, and interfaces</p>
 
-<p align="center"><a href="https://www.icoolgo.com/" target="_blank">演示</a></p>
+<p align="center"> <a href="README-CN.md">中文</a> |  English | <a href="https://www.icoolgo.com/" target="_blank">DEMO</a></p>
 
-## 简介
+## About
 
-使用AI编程开发工具Cursor开发的网址导航网站，内置导航API，支持自定义首页样式，搜索引擎、网站收藏等。
+A website navigation site developed using the AI programming tool Cursor, with built-in navigation API, support for customizing the homepage style, search engines, website bookmarks, etc.
 
 <p align="center">
   <a href="" >
@@ -31,47 +31,75 @@
     <img src="public/screenshot_3.png" alt="演示" />
   </a>
 </p>
+## 🚀 Features
 
-### 特点
+1. **Simple and practical**: The default URL navigation function, you can add your own URL favorites by customizing.
+2. **Multiple Layouts**: Customize the style of your page, as well as the way your navigation cards are laid out.
+3. **Perfect Function**: In addition to the navigation function, it also supports the customization of page elements, mode switching, etc.
 
-1. **简洁实用**：默认网址导航功能，可通过自定义添加自己的网址收藏。
-2. **多种布局方式**：自定义页面风格，以及导航卡片布局方式。
-3. **功能完善**：除了导航功能，还支持页面元素的自定义，模式切换等。
+## 🚀 Already functional
 
-### 已有功能
+- Built-in multiple search engine switching
+- My Favorites (support adding favorites)
+- URL navigation (built-in navigation API common to product managers)
+- Link/version information (custom via API)
+- Mode switching (System/Light/Dark)
+- Settings page (background wallpaper/search engine/navigation style)
+- Three background wallpaper styles (solid color/gradient/wallpaper support set mask, wallpaper blur)
+- Search engine settings (default search, icon/text display, search engine switch, search box style)
+- Navigation icon styles (large icons, small icons, card style)
 
-- 内置多个搜索引擎切换
-- 我的收藏（支持添加收藏）
-- 网址导航（内置产品经理常用导航API）
-- 友情连接/版本信息（通过API自定义）
-- 模式切换（系统/明亮/暗黑）
-- 设置页（背景壁纸/搜索引擎/导航风格）
-- 三种背景壁纸风格（纯色/渐变/壁纸支持设置遮罩、壁纸模糊）
-- 搜索引擎设置（默认搜索、图标/文字显示、搜索引擎开关、搜索框样式）
-- 导航图标样式（大图标、小图标、卡片式）
+## 🚀 Future Feature Plan
 
-### 后续功能计划
+- Add search keyword history, you can clear the search history with one click
+- Added the URL navigation management function, which can directly manage the commonly used URL navigation in the API after logging in
+- Added search engine add feature, add custom search engine
+- Added the function of importing URLs in batches, and supported one-click import of common browser bookmark HTML files
+- Add the list of hot searches, and call the latest hot searches through API [Weibo, Hupu, Zhihu, Baidu, 360]
 
-- 增加搜索关键词历史记录，可以一键清除搜索历史
-- 增加网址导航管理功能，登录后直接管理API里常用网址导航
-- 增加搜索引擎添加功能，添加自定义搜索引擎
-- 增加批量导入网址功能，支持常见的浏览器书签html文件一键导入
-- 增加热搜列表，通过API调用最新热搜【微博、虎扑、知乎、百度、360】
+## 📦 Installation & Deployment
 
-## 使用
+### Using Node.js
 
-请先安装 node.js v16， 然后执行以下命令：
+For local development or deployment on a Node.js server:
 
-```bash
+Clone the repository:
+
+```
+git clone https://github.com/xmsumi/icoolgo-pm-navigator.git
+cd icoolgo-pm-navigator
+```
+
+Install dependencies:
+
+```
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+Run the development server:
+
+```
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
 ```
 
-## 发布
+Open [http://localhost:3000](http://localhost:3000/) in your browser to see the application.
 
-生成静态文件：
+For production deployment:
 
 ```
+# Build the application
 npm run build
+
+# Start the production server
+npm start
 ```
 
 ## License
