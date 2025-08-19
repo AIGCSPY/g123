@@ -6,8 +6,8 @@ import { Toaster } from 'sonner';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "爱酷导航 - 产品经理工具导航,开源自定义标签页,icoolgo",
-  description: "爱酷导航，一站式产品经理工具导航，多搜索引擎聚合，常用网站分类展示，支持自定义常用网址收藏",
+  title: "AI工具导航 - 人工智能工具大全,AI导航网站",
+  description: "AI工具导航，精选最新最全的人工智能工具，包括AI写作、AI绘画、AI编程、AI视频等AI工具，助力提升工作效率",
 };
 
 export default function RootLayout({

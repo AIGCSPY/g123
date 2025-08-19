@@ -1,46 +1,46 @@
 {
   "links": [
     {
-      "name": "Axure原型网",
-      "url": "https://www.axurecn.com",
-      "description": "专业的原型设计分享工具"
+      "name": "AI工具集",
+      "url": "https://ai.google.dev",
+      "description": "Google AI开发工具"
     },
     {
-      "name": "苏米客",
-      "url": "https://www.xmsumi.com",
-      "description": "10+年产品经理分享"
+      "name": "OpenAI",
+      "url": "https://openai.com",
+      "description": "ChatGPT和GPT模型开发者"
     },
     {
-      "name": "摸鱼范",
-      "url": "http://www.moyufan.com",
-      "description": "摸鱼有范，效率更高"
+      "name": "Anthropic",
+      "url": "https://www.anthropic.com",
+      "description": "Claude AI助手开发公司"
     },
     {
-      "name": "爱酷导航",
-      "url": "http://www.icoolgo.com",
-      "description": "产品经理导航分享"
+      "name": "AI研究院",
+      "url": "https://huggingface.co",
+      "description": "开源AI模型社区"
     },
     {
-      "name": "稿字体",
-      "url": "http://www.gaoziti.com",
-      "description": "产品经理导航分享"
+      "name": "AI技术博客",
+      "url": "https://www.deepmind.com",
+      "description": "DeepMind AI研究"
     }
   ],
   "copyright": {
-    "text": "© 2019-2025 by 爱酷导航",
+    "text": "© 2024-2025 by AI工具导航",
     "links": [
       {
-        "text": "爱酷导航",
-        "url": "http://www.icoolgo.com"
+        "text": "AI工具导航",
+        "url": "#"
       },
       {
-        "text": "苏米客",
-        "url": "https://www.xmsumi.com"
+        "text": "联系我们",
+        "url": "#"
       }
     ],
     "icp": {
-      "text": "闽ICP备15002536号-6",
-      "url": "http://beian.miit.gov.cn/"
+      "text": "AI工具导航",
+      "url": "#"
     }
   }
 }

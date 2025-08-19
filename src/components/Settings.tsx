@@ -43,8 +43,8 @@ export interface Settings {
   background: {
     type: 'color' | 'gradient' | 'image';
     value: string;
-    overlay: number;
-    blur: number;
+    // overlay: number; // 移除
+    // blur: number;     // 移除
   };
   search: {
     defaultEngine: string;
@@ -61,9 +61,9 @@ export interface Settings {
 const DEFAULT_SETTINGS: Settings = {
   background: {
     type: 'color',
-    value: '#edf0f3',
-    overlay: 30,
-    blur: 8,
+    value: '#f5f5f5',
+    // overlay: 30, // 移除
+    // blur: 8,     // 移除
   },
   search: {
     defaultEngine: 'baidu',
@@ -79,11 +79,21 @@ const DEFAULT_SETTINGS: Settings = {
 
 const PRESET_BACKGROUNDS = {
   colors: [
+    { name: '底色', value: '#f5f5f5' },
+    { name: '浅灰', value: '#f8f8f8' },
+    { name: '中灰', value: '#e8e8e8' },
+    { name: '米白', value: '#fafafa' },
     { name: '简灰', value: '#edf0f3' },
     { name: '象牙白', value: '#fffff0' },
     { name: '薄荷绿', value: '#f5fffa' },
     { name: '浅蓝', value: '#f0f8ff' },
-    { name: '米白', value: '#fafafa' },
+    { name: '樱花粉', value: '#ffb3d9' },
+    { name: '薰衣草', value: '#e6e6ff' },
+    { name: '蜜桃橙', value: '#ffcc99' },
+    { name: '青柠绿', value: '#ccffcc' },
+    { name: '天空蓝', value: '#87ceeb' },
+    { name: '珊瑚红', value: '#ff7f7f' },
+    { name: '柠檬黄', value: '#fffacd' },
   ],
   gradients: [
     { name: '日出', value: 'linear-gradient(120deg, #f6d365 0%, #fda085 100%)' },
@@ -91,6 +101,13 @@ const PRESET_BACKGROUNDS = {
     { name: '薰衣草', value: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)' },
     { name: '深海', value: 'linear-gradient(120deg, #1a365d 0%, #2d3748 100%)' },
     { name: '极光', value: 'linear-gradient(120deg, #00b4db 0%, #0083b0 100%)' },
+    { name: '彩虹', value: 'linear-gradient(120deg, #ff9a9e 0%, #fecfef 25%, #fecfef 50%, #fecfef 75%, #fecfef 100%)' },
+    { name: '火焰', value: 'linear-gradient(120deg, #ff416c 0%, #ff4b2b 100%)' },
+    { name: '森林', value: 'linear-gradient(120deg, #56ab2f 0%, #a8e6cf 100%)' },
+    { name: '紫霞', value: 'linear-gradient(120deg, #667eea 0%, #764ba2 100%)' },
+    { name: '金辉', value: 'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)' },
+    { name: '海洋', value: 'linear-gradient(120deg, #4facfe 0%, #00f2fe 100%)' },
+    { name: '星空', value: 'linear-gradient(120deg, #2196f3 0%, #21cbf3 100%)' },
   ],
 };
 
@@ -165,15 +182,18 @@ export function Settings({ onSettingsChange }: SettingsProps) {
     setSettings(newSettings);
     localStorage.setItem('pm-navigator-settings', JSON.stringify(newSettings));
     
-    if (newSettings.background.type === 'image') {
-      document.documentElement.style.setProperty('--blur-value', `${newSettings.background.blur}px`);
-      document.documentElement.style.setProperty('--overlay-value', `${newSettings.background.overlay / 100}`);
-    } else if (newSettings.background.type === 'gradient') {
-      document.documentElement.style.setProperty('--gradient-value', newSettings.background.value);
-      document.documentElement.style.setProperty('--overlay-value', `${newSettings.background.overlay / 100}`);
-    } else {
-      document.documentElement.style.setProperty('--color-value', newSettings.background.value);
-      document.documentElement.style.setProperty('--overlay-value', `${newSettings.background.overlay / 100}`);
+    // 应用背景设置
+    const root = document.documentElement;
+    const isDark = root.classList.contains('dark');
+    
+    // 移除背景设置中的遮罩透明度和模糊程度
+    root.style.removeProperty('--overlay-value');
+    root.style.removeProperty('--blur-value');
+    
+    if (newSettings.background.type === 'gradient') {
+      root.style.setProperty('--gradient-value', newSettings.background.value);
+    } else if (newSettings.background.type === 'color') {
+      root.style.setProperty('--color-value', newSettings.background.value);
     }
     
     // 触发自定义事件通知其他组件
@@ -219,7 +239,18 @@ export function Settings({ onSettingsChange }: SettingsProps) {
       ...settings,
       theme: themes[nextIndex]
     };
-    handleSettingsChange(newSettings);
+    
+    // 先应用主题，然后重新应用背景设置
+    const root = document.documentElement;
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const theme = newSettings.theme === 'system' ? systemTheme : newSettings.theme;
+    root.classList.remove('light', 'dark');
+    root.classList.add(theme);
+    
+    // 延迟一下再应用背景设置，确保主题类已经生效
+    setTimeout(() => {
+      handleSettingsChange(newSettings);
+    }, 10);
   };
 
   return (
@@ -266,6 +297,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
               </TabsList>
               
               <TabsContent value="background" className="space-y-4">
+                {/* 只保留颜色、渐变、壁纸选择，不再有遮罩和模糊 */}
                 <div className="space-y-2">
                   <Label>背景类型</Label>
                   <Select
@@ -279,6 +311,8 @@ export function Settings({ onSettingsChange }: SettingsProps) {
                           value: value === 'image' ? getWallpaperUrl(1) : 
                                  value === 'gradient' ? PRESET_BACKGROUNDS.gradients[0].value :
                                  PRESET_BACKGROUNDS.colors[0].value,
+                          // overlay: 0, // 移除
+                          // blur: 0,    // 移除
                         },
                       })
                     }
@@ -293,15 +327,15 @@ export function Settings({ onSettingsChange }: SettingsProps) {
                     </SelectContent>
                   </Select>
                 </div>
-
+                {/* 颜色、渐变、壁纸选择部分保留 */}
                 {settings.background.type === 'color' && (
                   <div className="space-y-2">
                     <Label>选择颜色</Label>
-                    <div className="grid grid-cols-5 gap-2">
+                    <div className="grid grid-cols-4 gap-2">
                       {PRESET_BACKGROUNDS.colors.map((color) => (
                         <button
                           key={color.value}
-                          className="w-full aspect-square rounded-lg border-2 transition-all"
+                          className="w-full aspect-square rounded-lg border-2 transition-all relative group"
                           style={{
                             backgroundColor: color.value,
                             borderColor: settings.background.value === color.value ? '#3b82f6' : 'transparent',
@@ -315,7 +349,12 @@ export function Settings({ onSettingsChange }: SettingsProps) {
                               },
                             })
                           }
-                        />
+                          title={color.name}
+                        >
+                          <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 rounded-lg">
+                            {color.name}
+                          </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -406,42 +445,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
                     </div>
                   </div>
                 )}
-
-                <div className="space-y-2">
-                  <Label>遮罩透明度</Label>
-                  <Slider
-                    value={[settings.background.overlay]}
-                    onValueChange={([value]) =>
-                      handleSettingsChange({
-                        ...settings,
-                        background: {
-                          ...settings.background,
-                          overlay: value,
-                        },
-                      })
-                    }
-                    max={100}
-                    step={1}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>模糊程度</Label>
-                  <Slider
-                    value={[settings.background.blur]}
-                    onValueChange={([value]) =>
-                      handleSettingsChange({
-                        ...settings,
-                        background: {
-                          ...settings.background,
-                          blur: value,
-                        },
-                      })
-                    }
-                    max={20}
-                    step={1}
-                  />
-                </div>
+                {/* 移除遮罩透明度和模糊程度的 Slider 控件 */}
               </TabsContent>
 
               <TabsContent value="search" className="space-y-4">

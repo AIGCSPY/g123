@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   DropdownMenu,
@@ -34,8 +34,29 @@ export const SearchBox = ({
   const [selectedEngine, setSelectedEngine] = useState<SearchEngine | null>(null);
   const [query, setQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [isMounted, setIsMounted] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // 客户端挂载状态
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // 键盘事件处理
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isDropdownOpen) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isDropdownOpen]);
+
+
 
   // 从API获取搜索引擎配置
   useEffect(() => {
@@ -92,40 +113,46 @@ export const SearchBox = ({
       const savedSettings = localStorage.getItem('pm-navigator-settings');
       if (savedSettings) {
         const settings = JSON.parse(savedSettings);
-        // 更新搜索引擎状态
-        const updatedEngines = engines.map(engine => {
-          const savedEngine = settings.search.engines.find((e: SearchEngine) => e.id === engine.id);
-          return savedEngine ? { ...engine, enabled: savedEngine.enabled } : engine;
+        // 获取当前的engines和selectedEngine，避免闭包问题
+        setEngines(currentEngines => {
+          const updatedEngines = currentEngines.map(engine => {
+            const savedEngine = settings.search.engines.find((e: SearchEngine) => e.id === engine.id);
+            return savedEngine ? { ...engine, enabled: savedEngine.enabled } : engine;
+          });
+          
+          // 检查当前选中的引擎是否仍然可用
+          setSelectedEngine(currentSelected => {
+            const currentEngine = updatedEngines.find(e => e.id === currentSelected?.id);
+            if (currentEngine && !currentEngine.enabled) {
+              return updatedEngines.find(e => e.enabled) || updatedEngines[0];
+            }
+            return currentSelected;
+          });
+          
+          return updatedEngines;
         });
-        setEngines(updatedEngines);
-        
-        // 更新选中的搜索引擎
-        const currentEngine = updatedEngines.find(e => e.id === selectedEngine?.id);
-        if (currentEngine && !currentEngine.enabled) {
-          const newDefaultEngine = updatedEngines.find(e => e.enabled) || updatedEngines[0];
-          setSelectedEngine(newDefaultEngine);
-        }
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [engines, selectedEngine]);
+  }, []); // 移除依赖，使用函数式更新
 
-  // 监听设置变化
+  // 监听设置变化 - 简化版本，只监听引擎启用状态变化
   useEffect(() => {
     const handleSettingsChange = (event: CustomEvent) => {
       const newSettings = event.detail;
       console.log('Settings changed:', newSettings);
       
-      // 更新搜索引擎状态
-      const updatedEngines = newSettings.search.engines;
-      setEngines(updatedEngines);
-      
-      // 更新选中的搜索引擎
-      const newDefaultEngine = updatedEngines.find((e: SearchEngine) => e.id === newSettings.search.defaultEngine);
-      if (newDefaultEngine) {
-        setSelectedEngine(newDefaultEngine);
+      // 只在设置页面改变引擎启用状态时才更新
+      if (newSettings.search && newSettings.search.engines) {
+        setEngines(newSettings.search.engines);
+        
+        // 检查当前选中的引擎是否仍然启用
+        const currentSelected = newSettings.search.engines.find((e: SearchEngine) => e.id === newSettings.search.defaultEngine);
+        if (currentSelected && currentSelected.enabled) {
+          setSelectedEngine(currentSelected);
+        }
       }
     };
 
@@ -133,38 +160,7 @@ export const SearchBox = ({
     return () => window.removeEventListener('pm-navigator-settings-change', handleSettingsChange as EventListener);
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const updateDropdownPosition = () => {
-    if (dropdownRef.current) {
-      const rect = dropdownRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (isDropdownOpen) {
-      updateDropdownPosition();
-      window.addEventListener('scroll', updateDropdownPosition);
-      window.addEventListener('resize', updateDropdownPosition);
-      return () => {
-        window.removeEventListener('scroll', updateDropdownPosition);
-        window.removeEventListener('resize', updateDropdownPosition);
-      };
-    }
-  }, [isDropdownOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,43 +173,68 @@ export const SearchBox = ({
   const handleEngineChange = (engine: SearchEngine) => {
     console.log('handleEngineChange called with engine:', engine);
     setSelectedEngine(engine);
-    setIsDropdownOpen(false);
+    setIsDropdownOpen(false); // 关闭下拉框
     
-    // 更新本地存储中的默认搜索引擎
-    const savedSettings = localStorage.getItem('pm-navigator-settings');
-    if (savedSettings) {
-      const settings = JSON.parse(savedSettings);
-      settings.search.defaultEngine = engine.id;
-      localStorage.setItem('pm-navigator-settings', JSON.stringify(settings));
-      
-      // 触发自定义事件通知其他组件
-      const event = new CustomEvent('pm-navigator-settings-change', {
-        detail: settings
-      });
-      window.dispatchEvent(event);
-    }
-  };
-
-  const handleDropdownToggle = () => {
-    console.log('handleDropdownToggle called, current state:', isDropdownOpen);
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setIsDropdownOpen(false);
-    }
-    if (e.key === 'Enter' && isDropdownOpen) {
-      e.preventDefault();
-      const selectedButton = document.querySelector('.dropdown-item[aria-selected="true"]');
-      if (selectedButton) {
-        const engineId = selectedButton.getAttribute('data-engine-id');
-        const engine = engines.find(e => e.id === engineId);
-        if (engine) {
-          handleEngineChange(engine);
-        }
+    // 直接更新本地存储，不使用setTimeout
+    try {
+      const savedSettings = localStorage.getItem('pm-navigator-settings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        settings.search.defaultEngine = engine.id;
+        localStorage.setItem('pm-navigator-settings', JSON.stringify(settings));
       }
+    } catch (error) {
+      console.error('Failed to update localStorage:', error);
     }
+  };
+
+  // 自定义下拉菜单组件，使用portal避免页面晃动
+  const CustomDropdown = () => {
+    if (!isDropdownOpen || !triggerRef.current || !isMounted) return null;
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    
+    return createPortal(
+      <>
+        {/* 遮罩层 */}
+        <div
+          className="fixed inset-0 z-[9998]"
+          onClick={() => setIsDropdownOpen(false)}
+        />
+        {/* 下拉内容 */}
+        <div
+          className="fixed z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg min-w-[160px]"
+          style={{
+            top: triggerRect.bottom + 2,
+            left: triggerRect.left,
+          }}
+        >
+          {engines.filter(engine => engine.enabled).map(engine => (
+            <button
+              key={engine.id}
+              onClick={() => handleEngineChange(engine)}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                selectedEngine?.id === engine.id 
+                  ? 'text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/20' 
+                  : 'text-gray-700 dark:text-gray-200'
+              }`}
+            >
+              {engine.icon && displayMode !== 'name-only' && (
+                <img
+                  src={`/search-engines/${engine.icon}`}
+                  alt={engine.name}
+                  className="w-5 h-5"
+                />
+              )}
+              {displayMode !== 'icon-only' && (
+                <span>{engine.name}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </>,
+      document.body
+    );
   };
 
   const renderSearchBox = () => {
@@ -245,10 +266,8 @@ export const SearchBox = ({
                     console.log('Multi mode engine clicked:', engine);
                     handleEngineChange(engine);
                   }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all border flex items-center gap-2 ${
-                    selectedEngine.id === engine.id
-                      ? 'bg-white/90 text-gray-800 border-gray-300/50 shadow-md'
-                      : 'bg-white/50 text-gray-500 border-gray-200/30 hover:bg-white/60 hover:border-gray-300/50 hover:shadow-sm'
+                  className={`px-4 py-2 text-sm font-medium transition-all flex items-center gap-2 ${
+                    selectedEngine.id === engine.id ? 'minimal-button active' : 'minimal-button'
                   }`}
                 >
                   {engine.icon && displayMode !== 'name-only' && (
@@ -270,12 +289,15 @@ export const SearchBox = ({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={`在 ${selectedEngine.name} 中搜索...`}
-                className="w-full px-4 py-3 rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200/50 focus:border-gray-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 placeholder-gray-400 text-gray-800 pr-24 shadow-sm hover:shadow-md transition-all"
+                className="w-full px-4 py-3 minimal-search focus:outline-none pr-24 transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm font-medium"
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-white/90 text-gray-800 rounded-lg hover:bg-white border border-gray-200/50 hover:border-gray-300/50 shadow-sm hover:shadow-md transition-all"
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-lg transition-all text-sm font-medium"
               >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
                 搜索
               </button>
             </div>
@@ -285,74 +307,59 @@ export const SearchBox = ({
       default: // standard
         return (
           <form onSubmit={handleSearch} className="relative">
-            <div className="relative flex items-center bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200/50 focus-within:border-gray-300/50 focus-within:ring-2 focus-within:ring-blue-500/30 shadow-sm hover:shadow-md transition-all">
-              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-gray-50/50 transition-colors"
-                    aria-expanded={isDropdownOpen}
-                    aria-haspopup="listbox"
-                  >
-                    <div className="flex items-center gap-2">
-                      {selectedEngine.icon && displayMode !== 'name-only' && (
-                        <img
-                          src={`/search-engines/${selectedEngine.icon}`}
-                          alt={selectedEngine.name}
-                          className="w-5 h-5"
-                        />
-                      )}
-                      {displayMode !== 'icon-only' && (
-                        <span>{selectedEngine.name}</span>
-                      )}
-                    </div>
-                    <svg 
-                      className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[160px]">
-                  {engines.filter(engine => engine.enabled).map(engine => (
-                    <DropdownMenuItem
-                      key={engine.id}
-                      onClick={() => {
-                        console.log('Dropdown item clicked:', engine);
-                        handleEngineChange(engine);
-                      }}
-                      className={`flex items-center gap-2 ${
-                        selectedEngine.id === engine.id ? 'text-blue-600 font-medium' : 'text-gray-700'
-                      }`}
-                    >
-                      {engine.icon && displayMode !== 'name-only' && (
-                        <img
-                          src={`/search-engines/${engine.icon}`}
-                          alt={engine.name}
-                          className="w-5 h-5"
-                        />
-                      )}
-                      {displayMode !== 'icon-only' && (
-                        <span>{engine.name}</span>
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
-              <div className="h-6 w-px bg-gray-200/50 mx-2"></div>
+            <div className="minimal-search relative flex items-center h-12 max-w-full">
+              <button
+                ref={triggerRef}
+                type="button"
+                onClick={() => {
+                  console.log('Trigger button clicked, current state:', isDropdownOpen);
+                  setIsDropdownOpen(!isDropdownOpen);
+                }}
+                className="flex items-center gap-1 px-3 h-full border-r border-white/20 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-all text-sm flex-shrink-0"
+                aria-haspopup="listbox"
+                aria-expanded={isDropdownOpen}
+              >
+                <div className="flex items-center gap-2">
+                  {selectedEngine.icon && displayMode !== 'name-only' && (
+                    <img
+                      src={`/search-engines/${selectedEngine.icon}`}
+                      alt={selectedEngine.name}
+                      className="w-5 h-5 object-contain"
+                    />
+                  )}
+                  {displayMode !== 'icon-only' && (
+                    <span className="font-medium text-xs hidden sm:inline">{selectedEngine.name}</span>
+                  )}
+                </div>
+                <svg 
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
               
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索..."
-                className="flex-1 px-4 py-3 bg-transparent border-0 focus:outline-none placeholder-gray-400 text-gray-800"
+                placeholder="搜索 AI 工具..."
+                className="flex-1 px-3 h-full bg-transparent border-0 focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm font-medium min-w-0"
               />
+              
+              <button
+                type="submit"
+                className="flex items-center gap-1 px-3 sm:px-4 h-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium text-sm transition-all rounded-r-[14px] flex-shrink-0"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span className="hidden sm:inline">搜索</span>
+              </button>
             </div>
+            <CustomDropdown />
           </form>
         );
     }

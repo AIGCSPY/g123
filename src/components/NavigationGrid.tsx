@@ -4,6 +4,45 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { addToFavorites } from './CustomNavigation';
 import { toast } from 'sonner';
+
+// 自定义成功提示函数
+const showSuccessToast = (message: string) => {
+  // 移除已存在的提示
+  const existingToasts = document.querySelectorAll('.success-toast');
+  existingToasts.forEach(toast => toast.remove());
+
+  const toastElement = document.createElement('div');
+  toastElement.className = 'success-toast';
+  toastElement.innerHTML = `
+    <div class="success-toast-content">
+      <div class="success-toast-icon">
+        <svg width="14" height="14" fill="white" viewBox="0 0 24 24">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <div class="success-toast-text">${message}</div>
+    </div>
+    <div class="success-toast-progress"></div>
+  `;
+  
+  document.body.appendChild(toastElement);
+  
+  // 触发动画
+  requestAnimationFrame(() => {
+    toastElement.classList.add('show');
+  });
+  
+  // 3秒后移除
+  setTimeout(() => {
+    toastElement.classList.remove('show');
+    setTimeout(() => {
+      if (toastElement.parentNode) {
+        toastElement.parentNode.removeChild(toastElement);
+      }
+    }, 300);
+  }, 3000);
+};
+
 import { Button } from '@/components/ui/button';
 
 interface Site {
@@ -196,9 +235,22 @@ export const NavigationGrid = ({
     }
   };
 
-  // 处理图标路径
-  const getIconPath = (icon: string) => {
+  // 处理图标路径 - 使用免费API获取网站图标
+  const getIconPath = (icon: string, url?: string) => {
+    // 优先使用API获取网站图标
+    if (url) {
+      try {
+        const domain = new URL(url).hostname;
+        // 使用多个免费的favicon API作为备选
+        return `https://favicon.zhusl.com/ico?url=${domain}`;
+      } catch (error) {
+        console.warn('Invalid URL for favicon API:', url);
+      }
+    }
+    
+    // 备选方案：如果有本地图标路径
     if (!icon) return '/default-favicon.png';
+    
     // 如果已经是完整的URL，直接返回
     if (icon.startsWith('http://') || icon.startsWith('https://')) {
       return icon;
@@ -217,9 +269,7 @@ export const NavigationGrid = ({
     setActiveMoreMenu(activeMoreMenu === siteId ? null : siteId);
   };
 
-  const handleAddToFavorites = (site: Site, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleAddToFavorites = (site: Site) => {
     
     try {
       // 确保 URL 是有效的
@@ -236,12 +286,12 @@ export const NavigationGrid = ({
       }
       
       if (favorites.some((fav: any) => fav.url === url.toString())) {
-        toast.error('该网站已在收藏列表中');
+        showSuccessToast('该工具已在收藏列表中');
         return;
       }
       // 直接传递本地图标路径
       addToFavorites(site.title, url.toString(), site.icon);
-      toast.success('已添加到收藏');
+      showSuccessToast('✨ 已成功添加到收藏');
     } catch (error) {
       console.error('Invalid URL:', site.url);
       toast.error('无效的URL');
@@ -251,88 +301,97 @@ export const NavigationGrid = ({
   return (
     <div className="w-full">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-color)' }}>网站导航</h2>
+
         
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Button
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          <button
             onClick={() => filterByCategory(0)}
-            variant={activeCategory === 0 || activeCategory === null ? "default" : "outline"}
-            size="sm"
+            className={`minimal-button px-6 py-3 ${
+              activeCategory === 0 || activeCategory === null ? 'active' : ''
+            }`}
           >
-            全部
-          </Button>
+            全部工具
+          </button>
           
           {mainCategories.map(category => (
-            <Button
+            <button
               key={category.id}
               onClick={() => filterByCategory(category.id)}
-              variant={activeCategory === category.id ? "default" : "outline"}
-              size="sm"
+              className={`minimal-button px-6 py-3 ${
+                activeCategory === category.id ? 'active' : ''
+              }`}
             >
               {category.name}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
       
       <div className={`grid ${getGridLayoutClass()}`}>
         {filteredSites.map(site => (
-          <a
+          <div
             key={site.id}
-            href={site.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${getSiteItemClass()} group relative`}
-            style={{ color: 'var(--text-color)' }}
+            className="minimal-card group relative p-4 block"
           >
-            <div className={`${getIconContainerClass()} relative mr-4 bg-[var(--bg-light)] rounded-md p-1`}>
-              <Image
-                src={getIconPath(site.icon)}
-                alt={site.title}
-                fill
-                className="object-contain rounded-md group-hover:scale-105 transition-transform"
-                sizes={iconStyle === 'large' ? '64px' : iconStyle === 'small' ? '32px' : '48px'}
-              />
-            </div>
-            <div className="flex-grow min-w-0">
-              <h3 className="font-medium truncate group-hover:text-[var(--primary-color)] transition-colors">
-                {site.title}
-              </h3>
-              {iconStyle !== 'small' && (
-                <p className="text-sm text-[var(--text-secondary)] line-clamp-1 mt-1">
-                  {site.desp}
-                </p>
-              )}
-            </div>
-
-            {/* 更多操作按钮 */}
+            {/* 极简收藏按钮 */}
             <button
-              onClick={(e) => handleMoreClick(site.id, e)}
-              className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-[var(--bg-light)] text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-all"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddToFavorites(site);
+              }}
+              className="minimal-favorite absolute top-3 right-3 p-1.5 opacity-0 group-hover:opacity-100 transition-all"
+              title="添加到收藏"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </button>
 
-            {/* 更多操作菜单 */}
-            {activeMoreMenu === site.id && (
-              <div className="absolute top-10 right-2 rounded-md shadow-sm border bg-card py-1 z-10">
-                <button
-                  onClick={(e) => {
-                    handleAddToFavorites(site, e);
-                    setActiveMoreMenu(null); // 点击后隐藏菜单
-                  }}
-                  className="w-full px-4 py-2 text-left text-sm text-[var(--text-color)] hover:text-[var(--primary-color)] hover:bg-[var(--bg-light)] transition-colors flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                  添加到收藏
-                </button>
+            <a
+              href={site.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <div className="flex items-start">
+                <div className={`${getIconContainerClass()} relative mr-3 rounded-lg bg-white/80 dark:bg-gray-800/80 p-2 flex-shrink-0 shadow-sm backdrop-blur-sm`}>
+                  <Image
+                    src={getIconPath(site.icon, site.url)}
+                    alt={site.title}
+                    fill
+                    className="object-contain rounded-md"
+                    sizes={iconStyle === 'large' ? '64px' : iconStyle === 'small' ? '32px' : '48px'}
+                    onError={(e) => {
+                      // 如果API图标加载失败，回退到本地图标
+                      const target = e.target as HTMLImageElement;
+                      const fallbackPath = site.icon?.startsWith('/') ? site.icon : `/${site.icon}`;
+                      if (target.src !== fallbackPath && site.icon) {
+                        target.src = fallbackPath;
+                      } else {
+                        target.src = '/default-favicon.png';
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex-grow min-w-0">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <h3 className="font-semibold text-base text-gray-900 dark:text-gray-100 truncate leading-tight">
+                      {site.title}
+                    </h3>
+                    {site.isrec === 1 && (
+                      <span className="text-base">🔥</span>
+                    )}
+                  </div>
+                  {iconStyle !== 'small' && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                      {site.desp}
+                    </p>
+                  )}
+                </div>
               </div>
-            )}
-          </a>
+            </a>
+
+          </div>
         ))}
       </div>
     </div>

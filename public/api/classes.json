@@ -1,1 +1,47 @@
-[{"id":44,"fid":7,"name":"技术社区","sort":0},{"id":30,"fid":6,"name":"裂变涨粉","sort":0},{"id":31,"fid":6,"name":"H5创意","sort":0},{"id":33,"fid":6,"name":"表单问卷","sort":0},{"id":34,"fid":6,"name":"常用工具","sort":0},{"id":35,"fid":6,"name":"行业资讯","sort":0},{"id":36,"fid":6,"name":"社群运营","sort":0},{"id":37,"fid":1,"name":"图片\/素材","sort":0},{"id":38,"fid":1,"name":"LOGO\/字体","sort":0},{"id":39,"fid":1,"name":"矢量图标","sort":0},{"id":40,"fid":1,"name":"纹理笔刷","sort":0},{"id":41,"fid":1,"name":"行业资讯","sort":0},{"id":42,"fid":1,"name":"酷站模版","sort":0},{"id":43,"fid":3,"name":"常用工具","sort":0},{"id":29,"fid":6,"name":"写作排版","sort":0},{"id":45,"fid":27,"name":"技术社区","sort":0},{"id":46,"fid":5,"name":"技术社区","sort":0},{"id":47,"fid":27,"name":"技术框架","sort":0},{"id":48,"fid":3,"name":"插件组件","sort":0},{"id":49,"fid":4,"name":"PHP","sort":0},{"id":50,"fid":7,"name":"常用网站","sort":0},{"id":51,"fid":4,"name":"Java","sort":0},{"id":52,"fid":4,"name":"效率工具","sort":0},{"id":53,"fid":7,"name":"软件\/工具","sort":0},{"id":54,"fid":4,"name":"Python","sort":0},{"id":55,"fid":27,"name":"Android","sort":0},{"id":56,"fid":27,"name":"iOS","sort":0},{"id":57,"fid":3,"name":"小程序相关","sort":0},{"id":15,"fid":3,"name":"博客\/团队","sort":0},{"id":2,"fid":0,"name":"产品","sort":0},{"id":3,"fid":0,"name":"前端","sort":0},{"id":4,"fid":0,"name":"后端","sort":0},{"id":5,"fid":0,"name":"测试","sort":0},{"id":6,"fid":0,"name":"运营","sort":0},{"id":7,"fid":0,"name":"其他","sort":0},{"id":8,"fid":1,"name":"灵感创意","sort":0},{"id":9,"fid":1,"name":"效率工具","sort":0},{"id":10,"fid":1,"name":"原型交互","sort":0},{"id":11,"fid":6,"name":"媒体平台","sort":0},{"id":12,"fid":6,"name":"热点必备","sort":0},{"id":13,"fid":3,"name":"框架类库","sort":0},{"id":14,"fid":3,"name":"图形动效","sort":0},{"id":1,"fid":0,"name":"设计","sort":0},{"id":16,"fid":3,"name":"技术社区","sort":0},{"id":17,"fid":4,"name":"技术社区","sort":0},{"id":18,"fid":5,"name":"效率工具","sort":0},{"id":19,"fid":1,"name":"色彩搭配","sort":0},{"id":20,"fid":2,"name":"行业资讯","sort":0},{"id":21,"fid":2,"name":"信息图表","sort":0},{"id":22,"fid":2,"name":"数据参考","sort":0},{"id":23,"fid":2,"name":"常用工具","sort":0},{"id":24,"fid":2,"name":"数据统计","sort":0},{"id":25,"fid":4,"name":"代码托管","sort":0},{"id":26,"fid":4,"name":"云服务","sort":0},{"id":27,"fid":0,"name":"移动端","sort":0},{"id":28,"fid":6,"name":"配图制作","sort":0}]
+[
+  {"id": 1, "fid": 0, "name": "AI写作", "sort": 1},
+  {"id": 2, "fid": 0, "name": "AI绘画", "sort": 2},
+  {"id": 3, "fid": 0, "name": "AI编程", "sort": 3},
+  {"id": 4, "fid": 0, "name": "AI视频", "sort": 4},
+  {"id": 5, "fid": 0, "name": "AI音频", "sort": 5},
+  {"id": 6, "fid": 0, "name": "AI设计", "sort": 6},
+  {"id": 7, "fid": 0, "name": "AI办公", "sort": 7},
+  {"id": 8, "fid": 0, "name": "AI学习", "sort": 8},
+  {"id": 9, "fid": 0, "name": "AI工具", "sort": 9},
+  
+  {"id": 11, "fid": 1, "name": "文本生成", "sort": 0},
+  {"id": 12, "fid": 1, "name": "内容优化", "sort": 0},
+  {"id": 13, "fid": 1, "name": "翻译工具", "sort": 0},
+  
+  {"id": 21, "fid": 2, "name": "图像生成", "sort": 0},
+  {"id": 22, "fid": 2, "name": "图像编辑", "sort": 0},
+  {"id": 23, "fid": 2, "name": "艺术创作", "sort": 0},
+  
+  {"id": 31, "fid": 3, "name": "代码生成", "sort": 0},
+  {"id": 32, "fid": 3, "name": "代码优化", "sort": 0},
+  {"id": 33, "fid": 3, "name": "调试工具", "sort": 0},
+  
+  {"id": 41, "fid": 4, "name": "视频生成", "sort": 0},
+  {"id": 42, "fid": 4, "name": "视频编辑", "sort": 0},
+  {"id": 43, "fid": 4, "name": "动画制作", "sort": 0},
+  
+  {"id": 51, "fid": 5, "name": "语音合成", "sort": 0},
+  {"id": 52, "fid": 5, "name": "语音识别", "sort": 0},
+  {"id": 53, "fid": 5, "name": "音乐生成", "sort": 0},
+  
+  {"id": 61, "fid": 6, "name": "UI设计", "sort": 0},
+  {"id": 62, "fid": 6, "name": "Logo设计", "sort": 0},
+  {"id": 63, "fid": 6, "name": "平面设计", "sort": 0},
+  
+  {"id": 71, "fid": 7, "name": "文档处理", "sort": 0},
+  {"id": 72, "fid": 7, "name": "数据分析", "sort": 0},
+  {"id": 73, "fid": 7, "name": "自动化", "sort": 0},
+  
+  {"id": 81, "fid": 8, "name": "在线课程", "sort": 0},
+  {"id": 82, "fid": 8, "name": "知识问答", "sort": 0},
+  {"id": 83, "fid": 8, "name": "技能训练", "sort": 0},
+  
+  {"id": 91, "fid": 9, "name": "综合平台", "sort": 0},
+  {"id": 92, "fid": 9, "name": "API服务", "sort": 0},
+  {"id": 93, "fid": 9, "name": "开发工具", "sort": 0}
+]

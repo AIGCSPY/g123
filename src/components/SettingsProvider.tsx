@@ -7,9 +7,9 @@ import type { Settings as SettingsType } from './Settings';
 const defaultSettings: SettingsType = {
   background: {
     type: 'color',
-    value: '#edf0f3',
-    overlay: 30,
-    blur: 8,
+    value: '#f5f5f5',
+    // overlay: 30, // 移除
+    // blur: 8,     // 移除
   },
   search: {
     defaultEngine: 'baidu',
@@ -37,6 +37,22 @@ const SettingsContext = createContext<SettingsContextType | null>(null);
 // 检查是否在浏览器环境中
 const isBrowser = typeof window !== 'undefined';
 
+// 应用背景设置的辅助函数
+const applyBackgroundSettings = (background: SettingsType['background']) => {
+  if (!isBrowser) return;
+  
+  const root = document.documentElement;
+  // 不再设置 --blur-value 和 --overlay-value
+  
+  if (background.type === 'image') {
+    // 图片背景不需要额外设置，由page.tsx处理
+  } else if (background.type === 'gradient') {
+    root.style.setProperty('--gradient-value', background.value);
+  } else if (background.type === 'color') {
+    root.style.setProperty('--color-value', background.value);
+  }
+};
+
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<SettingsType>(defaultSettings);
   const [isMounted, setIsMounted] = useState(false);
@@ -56,16 +72,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         
         // 设置初始CSS变量
         if (parsed.background) {
-          if (parsed.background.type === 'image') {
-            document.documentElement.style.setProperty('--blur-value', `${parsed.background.blur}px`);
-            document.documentElement.style.setProperty('--overlay-value', `${parsed.background.overlay / 100}`);
-          } else if (parsed.background.type === 'gradient') {
-            document.documentElement.style.setProperty('--gradient-value', parsed.background.value);
-            document.documentElement.style.setProperty('--overlay-value', `${parsed.background.overlay / 100}`);
-          } else if (parsed.background.type === 'color') {
-            document.documentElement.style.setProperty('--color-value', parsed.background.value);
-            document.documentElement.style.setProperty('--overlay-value', `${parsed.background.overlay / 100}`);
-          }
+          applyBackgroundSettings(parsed.background);
         }
 
         // 应用主题模式
@@ -91,12 +98,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         const systemTheme = mediaQuery.matches ? 'dark' : 'light';
         root.classList.remove('light', 'dark');
         root.classList.add(systemTheme);
+        
+        // 主题变化时重新应用背景设置
+        applyBackgroundSettings(settings.background);
       }
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [settings.theme]);
+  }, [settings.theme, settings.background]);
 
   const updateSettings = (newSettings: SettingsType) => {
     if (isBrowser) {
@@ -111,6 +121,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       const theme = newSettings.theme === 'system' ? systemTheme : newSettings.theme;
       root.classList.remove('light', 'dark');
       root.classList.add(theme);
+    }
+    
+    // 应用背景设置
+    if (newSettings.background) {
+      applyBackgroundSettings(newSettings.background);
     }
   };
 

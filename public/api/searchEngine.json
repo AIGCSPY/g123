@@ -57,18 +57,24 @@
       "enabled": true
     },
     {
-      "id": "music",
-      "name": "音乐搜索",
-      "url": "http://www.icoolgo.com/music/?type=netease&name={query}",
-      "icon": "music.png",
+      "id": "huggingface",
+      "name": "HuggingFace",
+      "url": "https://huggingface.co/search/full-text?q={query}",
+      "icon": "github.png",
       "enabled": true
-    }
-    ,
+    },
     {
-      "id": "seo",
-      "name": "站长工具",
-      "url": "https://seo.chinaz.com/{query}",
-      "icon": "seo.png",
+      "id": "arxiv",
+      "name": "arXiv",
+      "url": "https://arxiv.org/search/?query={query}&searchtype=all",
+      "icon": "google.png",
+      "enabled": true
+    },
+    {
+      "id": "paperswithcode",
+      "name": "Papers with Code",
+      "url": "https://paperswithcode.com/search?q={query}",
+      "icon": "github.png",
       "enabled": true
     }
   ]
